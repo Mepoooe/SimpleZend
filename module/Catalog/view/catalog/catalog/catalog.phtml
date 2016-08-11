@@ -1,0 +1,21 @@
+<div class="row">
+<?php
+
+  foreach ($catalog as $valueCatalog) {
+?>
+  <div class="col-xs-6 col-md-3">
+    <a href="#" class="thumbnail">
+      <img src="img/3.jpg" alt="...">
+    </a>
+    <div class="row">
+      <p class="col-md-4"><? echo $valueCatalog->getTitle(); ?></p>
+  </div>
+    <div class="row">
+        <p class="description"><? echo $valueCatalog->getDescription(); ?></p>
+         <a href="/" type="button" class="btn btn-info ">Заказать</a>
+    </div>
+  </div>
+  <?php
+}
+?>
+</div> 

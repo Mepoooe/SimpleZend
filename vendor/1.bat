@@ -1,0 +1,2 @@
+call doctrine-module orm:convert-mapping annotation module/Catalog/src/ --namespace="Catalog\Entity\\" --from-database
+call doctrine-module orm:generate-entities module/Catalog/src --generate-annotations=true
