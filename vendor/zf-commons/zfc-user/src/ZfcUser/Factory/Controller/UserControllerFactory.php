@@ -1,19 +1,9 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license.
+/**
+ * Created by PhpStorm.
+ * User: Clayton Daley
+ * Date: 5/6/2015
+ * Time: 6:50 PM
  */
 
 namespace ZfcUser\Factory\Controller;
@@ -21,27 +11,36 @@ namespace ZfcUser\Factory\Controller;
 use Zend\Mvc\Controller\ControllerManager;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use ZfcUser\Controller\RedirectCallback;
 use ZfcUser\Controller\UserController;
 
 class UserControllerFactory implements FactoryInterface
 {
+
     /**
-     * Create controller
+     * Create service
      *
-     * @param ControllerManager $serviceLocator
-     * @return UserController
+     * @param ServiceLocatorInterface $controllerManager
+     * @return mixed
      */
     public function createService(ServiceLocatorInterface $controllerManager)
     {
-        /* @var ServiceLocatorInterface $serviceLocator */
-        $serviceLocator = $controllerManager->getServiceLocator();
+        /* @var ControllerManager $controllerManager*/
+        $serviceManager = $controllerManager->getServiceLocator();
 
-        $userService = $serviceLocator->get('zfcuser_user_service');
-        $registerForm = $serviceLocator->get('zfcuser_register_form');
-        $loginForm = $serviceLocator->get('zfcuser_login_form');
-        $options = $serviceLocator->get('zfcuser_module_options');
+        /* @var RedirectCallback $redirectCallback */
+        $redirectCallback = $serviceManager->get('zfcuser_redirect_callback');
 
-        $controller = new UserController($userService, $options, $registerForm, $loginForm);
+        /* @var UserController $controller */
+        $controller = new UserController($redirectCallback);
+        $controller->setServiceLocator($serviceManager);
+
+        $controller->setChangeEmailForm($serviceManager->get('zfcuser_change_email_form'));
+        $controller->setOptions($serviceManager->get('zfcuser_module_options'));
+        $controller->setChangePasswordForm($serviceManager->get('zfcuser_change_password_form'));
+        $controller->setLoginForm($serviceManager->get('zfcuser_login_form'));
+        $controller->setRegisterForm($serviceManager->get('zfcuser_register_form'));
+        $controller->setUserService($serviceManager->get('zfcuser_user_service'));
 
         return $controller;
     }

@@ -42,7 +42,7 @@ return array(
                     ),
                     'defaults' => array(
                         'controller' => 'Catalog\Controller\Catalog',
-                        'action'     => 'catalog',
+                        'action'     => 'index',
                     ),
                 ),
             ),

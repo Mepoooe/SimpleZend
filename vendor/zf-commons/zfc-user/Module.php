@@ -1,31 +1,22 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license.
- */
 
 namespace ZfcUser;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
 
 class Module implements
-    AutoloaderProviderInterface
+    AutoloaderProviderInterface,
+    ConfigProviderInterface,
+    ServiceProviderInterface
 {
     public function getAutoloaderConfig()
     {
         return array(
+            'Zend\Loader\ClassMapAutoloader' => array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
@@ -34,7 +25,7 @@ class Module implements
         );
     }
 
-    public function getConfig()
+    public function getConfig($env = null)
     {
         return include __DIR__ . '/config/module.config.php';
     }
@@ -43,7 +34,16 @@ class Module implements
     {
         return array(
             'factories' => array(
-                'zfcUserAuthentication' => 'ZfcUser\Factory\Controller\Plugin\ZfcUserAuthenticationFactory',
+                'zfcUserAuthentication' => 'ZfcUser\Factory\Controller\Plugin\ZfcUserAuthentication',
+            ),
+        );
+    }
+
+    public function getControllerConfig()
+    {
+        return array(
+            'factories' => array(
+                'zfcuser' => 'ZfcUser\Factory\Controller\UserControllerFactory',
             ),
         );
     }
@@ -52,33 +52,45 @@ class Module implements
     {
         return array(
             'factories' => array(
-                'zfcUserDisplayName'    => 'ZfcUser\Factory\View\Helper\DisplayNameFactory',
-                'zfcUserIdentity'       => 'ZfcUser\Factory\View\Helper\IdentityFactory',
-                'zfcUserLoginWidget'    => 'ZfcUser\Factory\View\Helper\LoginWidgetFactory',
+                'zfcUserDisplayName' => 'ZfcUser\Factory\View\Helper\ZfcUserDisplayName',
+                'zfcUserIdentity' => 'ZfcUser\Factory\View\Helper\ZfcUserIdentity',
+                'zfcUserLoginWidget' => 'ZfcUser\Factory\View\Helper\ZfcUserLoginWidget',
             ),
         );
+
     }
 
     public function getServiceConfig()
     {
         return array(
+            'aliases' => array(
+                'zfcuser_zend_db_adapter' => 'Zend\Db\Adapter\Adapter',
+            ),
             'invokables' => array(
-                'ZfcUser\Authentication\Adapter\Db' => 'ZfcUser\Authentication\Adapter\Db',
-                'ZfcUser\Authentication\Storage\Db' => 'ZfcUser\Authentication\Storage\Db',
-                'ZfcUser\Form\Login'                => 'ZfcUser\Form\Login',
-                'zfcuser_user_service'              => 'ZfcUser\Service\User',
+                'zfcuser_register_form_hydrator'    => 'Zend\Stdlib\Hydrator\ClassMethods',
             ),
             'factories' => array(
-                'zfcuser_module_options'                        => 'ZfcUser\Factory\ModuleOptionsFactory',
-                'zfcuser_auth_service'                          => 'ZfcUser\Factory\AuthenticationServiceFactory',
-                'ZfcUser\Authentication\Adapter\AdapterChain'   => 'ZfcUser\Authentication\Adapter\AdapterChainServiceFactory',
-                'zfcuser_login_form'                            => 'ZfcUser\Factory\Form\LoginFormFactory',
-                'zfcuser_register_form'                         => 'ZfcUser\Factory\Form\RegisterFormFactory',
-                'zfcuser_user_mapper'                           => 'ZfcUser\Factory\UserMapperFactory',
-                'zfcuser_user_hydrator'                         => 'ZfcUser\Factory\Mapper\UserHydratorFactory',
-            ),
-            'aliases' => array(
-                'zfcuser_register_form_hydrator' => 'zfcuser_user_hydrator'
+                'zfcuser_redirect_callback' => 'ZfcUser\Factory\Controller\RedirectCallbackFactory',
+                'zfcuser_module_options' => 'ZfcUser\Factory\Options\ModuleOptions',
+                'ZfcUser\Authentication\Adapter\AdapterChain' => 'ZfcUser\Authentication\Adapter\AdapterChainServiceFactory',
+
+                // We alias this one because it's ZfcUser's instance of
+                // Zend\Authentication\AuthenticationService. We don't want to
+                // hog the FQCN service alias for a Zend\* class.
+                'zfcuser_auth_service' => 'ZfcUser\Factory\AuthenticationService',
+
+                'zfcuser_user_hydrator' => 'ZfcUser\Factory\UserHydrator',
+                'zfcuser_user_mapper' => 'ZfcUser\Factory\Mapper\User',
+
+                'zfcuser_login_form'            => 'ZfcUser\Factory\Form\Login',
+                'zfcuser_register_form'         => 'ZfcUser\Factory\Form\Register',
+                'zfcuser_change_password_form'  => 'ZfcUser\Factory\Form\ChangePassword',
+                'zfcuser_change_email_form'     => 'ZfcUser\Factory\Form\ChangeEmail',
+
+                'ZfcUser\Authentication\Adapter\Db' => 'ZfcUser\Factory\Authentication\Adapter\DbFactory',
+                'ZfcUser\Authentication\Storage\Db' => 'ZfcUser\Factory\Authentication\Storage\DbFactory',
+
+                'zfcuser_user_service'              => 'ZfcUser\Factory\Service\UserFactory',
             ),
         );
     }

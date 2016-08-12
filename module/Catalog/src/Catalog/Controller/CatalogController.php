@@ -14,14 +14,14 @@ class CatalogController extends AbstractActionController
 {
 	
 
-     public function catalogAction()
+     public function indexAction()
     {
         $entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
 
         $query = $entityManager->createQuery('SELECT u FROM Catalog\Entity\Products u ORDER BY u.id DESC');
         $rows = $query->getResult();
 
-        
+
         return array('catalog' => $rows);
         
         //return new ViewModel();

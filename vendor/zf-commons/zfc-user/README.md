@@ -14,7 +14,7 @@ ZfcUser is a user registration and authentication module for Zend Framework 2.
 Out of the box, ZfcUser works with Zend\Db, however alternative storage adapter
 modules are available (see below). ZfcUser provides the foundations for adding
 user authentication and registration to your ZF2 site. It is designed to be very
-simple and easily to extend.
+simple and easy to extend.
 
 More information and examples are available on the [ZfcUser Wiki](https://github.com/ZF-Commons/ZfcUser/wiki)
 
@@ -44,6 +44,11 @@ Features / Goals
 * Out-of-the-box support for Doctrine2 _and_ Zend\Db [COMPLETE]
 * Registration form protected with CAPTCHA [IN PROGRESS] \(Needs more options\)
 * Robust event system to allow for extending [IN PROGRESS]
+* Support for additional authentication mechanisms via plugins (Google,
+  Facebook, LDAP, etc) [INCOMPLETE]
+* Optional E-mail address verification [INCOMPLETE]
+* Forgot Password [INCOMPLETE]
+* Provide ActionController plugin and view helper [INCOMPLETE]
 
 Installation
 ------------
@@ -81,7 +86,6 @@ Installation
     return array(
         'modules' => array(
             // ...
-            'ZfcBase',
             'ZfcUser',
         ),
         // ...
@@ -198,8 +202,6 @@ The following options are available:
 - **allowed_login_states** - Array value, states which are allowing user to login.
   When user tries to login, is his/her state one of the following? Include null if
   you want user's with no state to login as well.
-
-> Note: **user_login_widget_view_template** is currently not used. To override the view templates the module uses, please see [this](https://github.com/ZF-Commons/ZfcUser/blob/master/docs/override-view-scripts.md) example.
 
 Changing Registration Captcha Element
 -------------------------------------

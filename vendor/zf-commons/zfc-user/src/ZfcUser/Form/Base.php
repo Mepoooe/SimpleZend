@@ -75,7 +75,7 @@ class Base extends ProvidesEventsForm
         ));
 
         $this->add(array(
-            'name' => 'id',
+            'name' => 'userId',
             'type' => 'Zend\Form\Element\Hidden',
             'attributes' => array(
                 'type' => 'hidden'
@@ -86,5 +86,11 @@ class Base extends ProvidesEventsForm
         //$csrf = new Element\Csrf('csrf');
         //$csrf->getValidator()->setTimeout($this->getRegistrationOptions()->getUserFormTimeout());
         //$this->add($csrf);
+
+        $this->getEventManager()->trigger('init', $this);
+    }
+
+    public function init()
+    {
     }
 }
